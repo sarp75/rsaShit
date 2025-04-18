@@ -192,8 +192,18 @@ public static class Factoriser
     /// <summary>
     /// Trial division factorization for smaller numbers
     /// </summary>
-    private static (BigInteger, BigInteger) FactoriseSmallNumber(BigInteger n)
+    public static (BigInteger, BigInteger) FactoriseSmallNumber(BigInteger n)
     {
+        if (n > BigInteger.Pow(2, 64))
+        {
+            Console.WriteLine("[!] Number is too large for trial division (n>2^64)");
+            Console.Write("[?] Bring in the chonky shit?(y/N) ");
+            string input = Console.ReadLine().ToLower();
+            if (input == "y")
+            {
+                EfficientFactorise.Factorise(n);
+            }
+        }
         Console.WriteLine("[*] Attempting trial division for smaller number...");
 
         // Check if the number is even

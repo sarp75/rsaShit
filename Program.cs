@@ -1,4 +1,5 @@
-﻿using rsaShit.Attacks;
+﻿using System.Numerics;
+using rsaShit.Attacks;
 using rsaShit.Core;
 
 namespace rsaShit
@@ -12,7 +13,15 @@ namespace rsaShit
             Welcome();
 
             // Parse args into RSAState
-            RSAState state = RSAState.FromArgs(args);
+            RSAState state;
+            if (args.Length > 0)
+            {
+                state = RSAState.FromArgs(args);
+            }
+            else
+            {
+                state = RSAState.Interactive();
+            }
 
             // Print what was received
             state.PrintKnownValues();
@@ -27,9 +36,11 @@ namespace rsaShit
             {
                 if (attack.CanExecute(state))
                 {
-                    Console.WriteLine(Color.Green+$"\n[>] {attack.Name} is doable..."+Color.Reset);
-attack.Execute(state);
-                        state.PrintKnownValues(attack.Name); // Show updated state
+                    Console.WriteLine(
+                        Color.Green + $"\n[>] {attack.Name} is doable..." + Color.Reset
+                    );
+                    attack.Execute(state);
+                    state.PrintKnownValues(attack.Name); // Show updated state
                 }
             }
 

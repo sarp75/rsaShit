@@ -71,15 +71,21 @@ namespace rsaShit.Core
             // Auto-detect hex
             if (input.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
                 return BigInteger.Parse(input.Substring(2), NumberStyles.HexNumber);
-            if (input.All("0123456789ABCDEFabcdef".Contains) && input.Length > 16)
-                return BigInteger.Parse(input, NumberStyles.HexNumber);
 
+            // Treat as unsigned decimal number
+            if (input.All(char.IsDigit))
+                return BigInteger.Parse(input, NumberStyles.Integer, CultureInfo.InvariantCulture);
+
+            // Fallback for other formats
             return BigInteger.Parse(input);
         }
 
         public void PrintKnownValues(string attackName = "")
         {
-            Console.WriteLine(attackName.Length > 0 ? $"\nValues from '{attackName}':":"\nKnown RSA values:");
+            Console.WriteLine(
+                attackName.Length > 0 ? $"\nValues from '{attackName}':" : "\nKnown RSA values:"
+            );
+            // ReSharper disable once NotAccessedVariable
             int knownCount = 0;
 
             if (e.HasValue)
@@ -113,11 +119,11 @@ namespace rsaShit.Core
                 knownCount++;
             }
 
-            Console.WriteLine(
+            /*Console.WriteLine(
                 knownCount == 0
                     ? $"{Color.Red}What do you even want this to do?"
                     : $"Total of: {Color.Green}{knownCount}{Color.Reset}"
-            );
+            );*/
         }
 
         public bool Has(string name)
@@ -140,6 +146,69 @@ namespace rsaShit.Core
                 if (!Has(name))
                     return false;
             return true;
+        }
+
+        public static RSAState Interactive()
+        {
+            var state = new RSAState();
+            Console.WriteLine(
+                "Enter RSA values (e, d, N, p, q, phi) one by one. Type 'done' to finish."
+            );
+
+            while (true)
+            {
+                Console.Write("> ");
+                string input = Console.ReadLine();
+
+                if (input?.ToLower() == "done")
+                    break;
+
+                string[] parts = input.Split('=');
+                if (parts.Length == 2)
+                {
+                    string key = parts[0].Trim().ToLower();
+                    string value = parts[1].Trim();
+
+                    BigInteger parsedValue = ParseBigInt(value);
+
+                    switch (key)
+                    {
+                        case "e":
+                            state.e = parsedValue;
+                            Console.WriteLine($"e is {parsedValue}");
+                            break;
+                        case "d":
+                            state.d = parsedValue;
+                            Console.WriteLine($"d is {parsedValue}");
+                            break;
+                        case "n":
+                            state.N = parsedValue;
+                            Console.WriteLine($"N is {parsedValue}");
+                            break;
+                        case "p":
+                            state.p = parsedValue;
+                            Console.WriteLine($"p is {parsedValue}");
+                            break;
+                        case "q":
+                            state.q = parsedValue;
+                            Console.WriteLine($"q is {parsedValue}");
+                            break;
+                        case "phi":
+                            state.phi = parsedValue;
+                            Console.WriteLine($"phi is {parsedValue}");
+                            break;
+                        default:
+                            Console.WriteLine($"Unknown key: {key}");
+                            break;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Format should be 'key=value'.");
+                }
+            }
+
+            return state;
         }
     }
 }

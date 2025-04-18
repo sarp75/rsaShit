@@ -36,31 +36,35 @@ public class ShitSplitter : IRsaAttack
 
             state.p = p;
             state.q = q;
-            Console.WriteLine(Color.Green+$"[+] Found p = {p}");
-            Console.WriteLine($"[+] Found q = {q}"+Color.Reset);
+            Console.WriteLine(Color.Green + $"[+] Found p = {p}");
+            Console.WriteLine($"[+] Found q = {q}" + Color.Reset);
 
             // Verify p * q = N
             if (p * q != N)
             {
-                Console.WriteLine(Color.Red+"[!] Error: p * q does not equal N. Check your shit."+Color.Reset);
+                Console.WriteLine(
+                    Color.Red + "[!] Error: p * q does not equal N. Check your shit." + Color.Reset
+                );
                 return;
             }
 
             // Step 2: Calculate phi(N) = (p-1)(q-1)
             BigInteger phi = (p - 1) * (q - 1);
             state.phi = phi;
-            Console.WriteLine(Color.Green+$"[+] Calculated phi(N) = {phi}");
+            Console.WriteLine(Color.Green + $"[+] Calculated phi(N) = {phi}");
 
             // Step 3: Calculate d = e^(-1) mod phi(N)
             BigInteger d = ModInverse(e, phi);
             state.d = d;
-            Console.WriteLine($"[+] Calculated d = {d}"+Color.Reset);
+            Console.WriteLine($"[+] Calculated d = {d}" + Color.Reset);
 
             // Verify e*d ≡ 1 (mod phi(N))
             BigInteger verification = (e * d) % phi;
             if (verification != 1)
             {
-                Console.WriteLine($"[!] Warning: Verification failed. e*d ≡ {verification} (mod phi(N)), expected 1");
+                Console.WriteLine(
+                    $"[!] Warning: Verification failed. e*d ≡ {verification} (mod phi(N)), expected 1"
+                );
             }
             else
             {
@@ -70,6 +74,26 @@ public class ShitSplitter : IRsaAttack
         catch (Exception ex)
         {
             Console.WriteLine($"[!] Attack failed: {ex.Message}");
+            Console.WriteLine("[?] Force trial factorization? (y/N): ");
+            string input = Console.ReadLine()!;
+            if (input.ToLower() == "y")
+            {
+                try
+                {
+                    var (a, b) = Factoriser.FactoriseSmallNumber(N);
+                    state.p = a;
+                    state.q = b;
+                }
+                catch (Exception exception)
+                {
+                    Console.WriteLine(exception);
+                    throw;
+                }
+            }
+            else
+            {
+                Console.WriteLine("[!] Exiting attack.");
+            }
         }
     }
 
@@ -80,7 +104,8 @@ public class ShitSplitter : IRsaAttack
             return 0;
 
         BigInteger m0 = m;
-        BigInteger y = 0, x = 1;
+        BigInteger y = 0,
+            x = 1;
 
         while (a > 1)
         {
