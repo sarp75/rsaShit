@@ -1,0 +1,6 @@
+/build/
+/cmake-build-debug/
+.env
+DESIGN.md
+/.idea/
+SECRET.md
