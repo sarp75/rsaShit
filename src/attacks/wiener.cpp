@@ -43,8 +43,8 @@ struct ConvPair { BigInt num; BigInt den; }; // num/den approximates ratio
 
 static std::vector<ConvPair> build_convergents(const std::vector<BigInt>& cf) {
     std::vector<ConvPair> out; out.reserve(cf.size());
-    BigInt p_minus2(uint64_t(0)); BigInt p_minus1(uint64_t(1));
-    BigInt q_minus2(uint64_t(1)); BigInt q_minus1(uint64_t(0));
+    BigInt p_minus2(static_cast<uint64_t>(0)); BigInt p_minus1(static_cast<uint64_t>(1));
+    BigInt q_minus2(static_cast<uint64_t>(1)); BigInt q_minus1(static_cast<uint64_t>(0));
     for(size_t i=0;i<cf.size(); ++i) {
         BigInt a = cf[i];
         BigInt p_i = a * p_minus1 + p_minus2;
@@ -57,14 +57,14 @@ static std::vector<ConvPair> build_convergents(const std::vector<BigInt>& cf) {
 }
 
 static bool is_perfect_square(const BigInt &x, BigInt &root_out) {
-    if(x.is_zero()) { root_out = BigInt(uint64_t(0)); return true; }
+    if(x.is_zero()) { root_out = BigInt(static_cast<uint64_t>(0)); return true; }
     BigInt r = BigInt::nth_root_floor(x, 2);
     if(r * r == x) { root_out = r; return true; }
     return false;
 }
 
 static bool try_convergents(const std::vector<ConvPair>& convs, const BigInt &n, const BigInt &e, WienerResult &res, std::ostringstream &log, const char *tag) {
-    BigInt one(uint64_t(1)); BigInt two(uint64_t(2)); BigInt four(uint64_t(4));
+    BigInt one(static_cast<uint64_t>(1)); BigInt two(static_cast<uint64_t>(2)); BigInt four(static_cast<uint64_t>(4));
     for(size_t i=0;i<convs.size(); ++i) {
         const auto &c = convs[i];
         BigInt k = c.num; // numerator
@@ -80,9 +80,9 @@ static bool try_convergents(const std::vector<ConvPair>& convs, const BigInt &n,
         BigInt four_n = four * n;
         if(!(bb >= four_n)) continue; // avoid unsigned underflow
         BigInt disc = bb - four_n;
-        BigInt zero(uint64_t(0));
+        BigInt zero(static_cast<uint64_t>(0));
         if(disc == zero) continue; // unlikely
-        BigInt sqrt_disc(uint64_t(0));
+        BigInt sqrt_disc(static_cast<uint64_t>(0));
         if(!is_perfect_square(disc, sqrt_disc)) continue;
         // parity check: (b + sqrt_disc) must be even
         BigInt sum = b + sqrt_disc;
