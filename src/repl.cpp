@@ -12,6 +12,7 @@
 #include "attacks/fermat.hpp"
 #include "attacks/rho.hpp"
 #include "attacks/coppersmith.hpp"
+#include "attacks/pminus1.hpp"
 #include "utils/parse.hpp"
 
 static BigInt big_from_parsed(const ParsedNumber &pn) {
@@ -531,6 +532,55 @@ int repl_main() {
                     std::cout << " (no root found)";
                 }
                 std::cout << " log=" << res.log << "\n";
+            }
+            continue;
+        }
+        if (line == "pminus1") {
+            std::cout << "enter N> ";
+            std::string n_in; std::getline(std::cin, n_in);
+            auto n_p = utils::parse_number_adv(n_in);
+            if(!n_p.known) { std::cout << "bad n\n"; continue; }
+            std::cout << "enter B1 (stage1 bound, dec default 100000)> ";
+            std::string b1_in; std::getline(std::cin, b1_in);
+            unsigned long long B1 = 100000ULL;
+            if(!b1_in.empty()) {
+                auto b1_p = utils::parse_number_adv(b1_in);
+                if(b1_p.known && b1_p.is_dec) B1 = std::stoull(b1_p.raw); }
+            std::cout << "enter B2 (stage2 bound, dec; 0 to disable, default 0)> ";
+            std::string b2_in; std::getline(std::cin, b2_in);
+            unsigned long long B2 = 0ULL;
+            if(!b2_in.empty()) {
+                auto b2_p = utils::parse_number_adv(b2_in);
+                if(b2_p.known && b2_p.is_dec) B2 = std::stoull(b2_p.raw); }
+            std::cout << "enter trials (bases to try, dec default 5)> ";
+            std::string t_in; std::getline(std::cin, t_in);
+            unsigned long long trials = 5ULL;
+            if(!t_in.empty()) {
+                auto t_p = utils::parse_number_adv(t_in);
+                if(t_p.known && t_p.is_dec) trials = std::stoull(t_p.raw); }
+            try {
+                BigInt n = big_from_parsed(n_p);
+                PMinus1Result pr = pollards_pminus1(n, B1, trials, B2);
+                if(pr.success) {
+                    std::cout << "p-1 factor: " << pr.factor.to_dec() << " (" << pr.factor.to_hex() << ")\n";
+                } else {
+                    std::cout << "p-1 failed: " << pr.log << "\n";
+                }
+            } catch(const std::exception &ex) { std::cout << "error: " << ex.what() << "\n"; }
+            continue;
+        }
+        if (line == "pminus1-selftest") {
+            // choose primes where p-1 is very smooth and a stage2 window can still work
+            BigInt p("1000003"); // p-1 = 2*3*167*997
+            BigInt q("1000033");
+            BigInt n = p * q;
+            unsigned long long B1 = 100000ULL;
+            unsigned long long B2 = 1000000ULL; // allow stage2 if needed
+            PMinus1Result pr = pollards_pminus1(n, B1, 5ULL, B2);
+            if(pr.success) {
+                std::cout << "p-1 success factor=" << pr.factor.to_dec() << " (" << pr.factor.to_hex() << ")\n";
+            } else {
+                std::cout << "p-1 selftest failed: " << pr.log << "\n";
             }
             continue;
         }

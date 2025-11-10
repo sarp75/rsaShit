@@ -20,6 +20,7 @@ RSA Attacks:
   fermat          - fermat factorization for close primes
   rho             - pollard's rho factorization
   coppersmith     - coppersmith small root attack for partial message recovery
+  pminus1         - pollard's p-1 factorization
 
 type 'help <command>' for detailed info on a specific attack.
 examples: 'help rho', 'help fermat', 'help wiener'
@@ -282,6 +283,37 @@ EXAMPLE (linear): solve 123*x + 456 ≡ 0 (mod N) for small x
 
 EXAMPLE (partial): m = m_high + x, e=3, recover last 16 bits of m
   - search space 65536, fast brute force
+)";
+        } else if (cmd == "pminus1") {
+            std::cout << R"(
+pminus1 - Pollard's p-1 Factorization
+=====================================
+
+WHEN TO USE:
+  - when n has a prime factor p such that p-1 is B1-smooth
+  - or p-1 = s * r where s is B1-smooth and r has a single large prime in (B1, B2]
+
+HOW IT WORKS (this tool):
+  - Stage 1: power a by prime powers ≤ B1 modulo n, then g = gcd(a-1, n)
+  - Stage 2 (optional): scan primes q in (B1, B2]; test gcd(a^q - 1, n)
+
+USAGE:
+  > pminus1
+  enter N> <composite>
+  enter B1 (stage1 bound, dec default 100000)> <bound1>
+  enter B2 (stage2 bound, dec; 0 to disable, default 0)> <bound2>
+  enter trials (bases to try, dec default 5)> <count>
+
+PARAMETERS:
+  - N: number to factor
+  - B1: stage 1 smoothness bound
+  - B2: stage 2 bound (0 disables stage 2)
+  - trials: number of bases to try (a values)
+
+NOTES:
+  - increasing B1 and B2 raises cost but improves success probability
+  - this stage 2 is a simple variant; good for demos and mid-size factors
+  - try multiple bases if stage 1 fails; add stage 2 for a wider net
 )";
         } else if (cmd == "show") {
             std::cout << R"(
