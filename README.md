@@ -60,7 +60,7 @@ sudo apt install -y build-essential cmake libgmp-dev
 Windows:
 
 ```bash
-#Fuck if I know. Use WSL or vcpkg to get GMP and CMake.
+# Fuck if I know. Use WSL or vcpkg to get GMP and CMake.
 ```
 
 ### Build
