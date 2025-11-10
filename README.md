@@ -2,6 +2,15 @@
 
 Proving that RSA is **shit**, one attack at a time.
 
+```text
+:::::::..   .::::::.   :::.     .::::::.   ::   .:  :::::::::::::::
+;;;;``;;;; ;;;`    `   ;;`;;   ;;;`    `  ,;;   ;;, ;;;;;;;;;;;''''
+ [[[,/[[[' '[==/[[[[, ,[[ '[[, '[==/[[[[,,[[[,,,[[[ [[[     [[     
+ $$$$$$c     '''    $c$$$cc$$$c  '''    $"$$$"""$$$ $$$     $$     
+ 888b "88bo,88b    dP 888   888,88b    dP 888   "88o888     88,    
+ MMMM   "W"  "YMmMY"  YMM   ""`  "YMmMY"  MMM    YMMMMM     MMM        
+```
+
 ## Features (current)
 
 - GMP-backed BigInt wrapper to save your time (RAII around `mpz_t`).
@@ -11,12 +20,15 @@ Proving that RSA is **shit**, one attack at a time.
     - `wiener` small-d attack & self-test.
     - `cmod` common modulus attack & self-test.
     - `fermat` for close prime factors & self-test.
+    - `rho` pollard's rho factorization.
+    - `coppersmith` small-root / partial-message recovery (full embedded LLL).
+- Extras:
     - `hi` responds back with `hello`.
 - Parsing for decimal / hex (`0x...`). Extended parsing (file:, idk) skeleton in place.
 
 ## Planned / Roadmap
 
-- Trial division, Pollard-Rho, Pollard p−1 implementations.
+- Trial division, Pollard p−1 implementations.
 - Auto pipeline executor (ordered stages per design doc).
 - SessionState with history ring buffer & `~/.rshit/history.log` JSON lines.
 - External tool wrappers (`gmp-ecm`, `msieve`).
@@ -47,8 +59,8 @@ sudo apt install -y build-essential cmake libgmp-dev
 
 Windows:
 
-```text
-Fuck if I know. Use WSL or vcpkg to get GMP and CMake.
+```bash
+#Fuck if I know. Use WSL or vcpkg to get GMP and CMake.
 ```
 
 ### Build
@@ -70,18 +82,18 @@ You enter the interactive REPL. Type `help` for commands.
 
 ## REPL Commands (current)
 
-| Command           | Purpose                                                        |
-|-------------------|----------------------------------------------------------------|
-| `help`            | list commands                                                  |
-| `quit` / `exit`   | leave REPL                                                     |
-| `lowe`            | wizard for low exponent broadcast (enter e, count, N[i], C[i]) |
-| `lowe-demo`       | tiny built-in low exponent example                             |
-| `wiener`          | wizard: enter N, e for small-d recovery                        |
-| `wiener-selftest` | generate a small vulnerable key and verify Wiener attack       |
-| `cmod`            | common modulus attack wizard (n, e1, e2, c1, c2)               |
-| `cmod-selftest`   | self-test for common modulus                                   |
-| `fermat`          | Fermat factorization wizard (n, optional max iterations)       |
-| `fermat-selftest` | self-test with close primes                                    |
+| Command          | Purpose                                                                  |
+|------------------|--------------------------------------------------------------------------|
+| `help`           | list commands                                                            |
+| `help <command>` | show detailed help for any command                                       |
+| `quit` / `exit`  | leave REPL                                                               |
+| `hi`             | respond with hello                                                       |
+| `lowe`           | wizard for low exponent broadcast (enter e, count, N[i], C[i])           |
+| `wiener`         | wizard: enter N, e for small-d recovery                                  |
+| `cmod`           | common modulus attack wizard (n, e1, e2, c1, c2)                         |
+| `fermat`         | fermat factorization wizard (n, optional max iterations)                 |
+| `rho`            | pollard's rho factorization (n, optional max iterations)                 |
+| `coppersmith`    | coppersmith small-root / partial-message recovery (see help coppersmith) |
 
 ## Usage Examples
 
@@ -130,13 +142,48 @@ enter max iterations (default 1000000)>
 fermat success: p=0x1000003f, q=0x5b
 ```
 
+### Pollard's Rho Factorization
+
+```text
+> rho
+enter N> 143
+max iters (dec, default 1000000)>
+rho factor: 11 (0xb)
+```
+
+### Coppersmith Small-Root / Partial Message
+
+Linear small-root (solve a*x + b ≡ 0 mod n for small x):
+
+```text
+> coppersmith
+enter type (1=linear, 2=partial-msg)> 1
+enter a (coeff of x)> 123
+enter b (constant)> 456
+enter n (modulus)> 0x1000003f
+coppersmith (linear) result: x=...
+```
+
+Partial-message (recover low bits of m when e is small):
+
+```text
+> coppersmith
+enter type (1=linear, 2=partial-msg)> 2
+enter c (ciphertext)> 0xdeadbeef
+enter e (exponent, typically 3 or 5)> 3
+enter n (modulus)> 0x1000003f
+enter m_high (known high bits of message)> 0x30390000
+enter unknown_bits (number of unknown low bits)> 16
+coppersmith (partial) result: m=... (x recovered)
+```
+
 ## License
 
 **MIT License**, I guess. Do whatever you want with it, I don't care.
 
 ## Safety Notes
 
-- Do not run against untrusted remote inputs without review.
+- Do not use this tool for illegal shit.
 
 ## Quick Troubleshooting
 
@@ -152,6 +199,8 @@ fermat success: p=0x1000003f, q=0x5b
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j
 ./build/rsaShit
+# or
+make -C build -j
 ```
 
 Enjoy proving that RSA is **absolute shit**!
