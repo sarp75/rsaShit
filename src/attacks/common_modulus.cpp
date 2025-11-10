@@ -18,7 +18,7 @@ CommonModulusResult common_modulus_attack(const BigInt &n,
                                           const BigInt &c2) {
     CommonModulusResult r;
     std::ostringstream log;
-    BigInt one(uint64_t(1));
+    BigInt one(static_cast<uint64_t>(1));
     if (BigInt::gcd(e1, e2) != one) {
         log << "gcd(e1,e2) != 1";
         r.log = log.str();

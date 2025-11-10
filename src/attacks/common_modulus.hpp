@@ -5,7 +5,7 @@
 
 struct CommonModulusResult {
     bool success{false};
-    BigInt m{uint64_t(0)};
+    BigInt m{static_cast<uint64_t>(0)};
     std::string log;
 };
 
