@@ -2,7 +2,7 @@
 
 void RSAKey::attempt_compute_d() {
     if(p.is_zero() || q.is_zero() || e.is_zero()) return;
-    BigInt one(uint64_t(1));
+    BigInt one(static_cast<uint64_t>(1));
     BigInt phi = (p - one) * (q - one);
     auto inv = BigInt::mod_inverse(e, phi);
     if(inv) d = *inv;

@@ -15,8 +15,8 @@ namespace utils {
 
     static std::string trim(const std::string &in) {
         size_t a=0,b=in.size();
-        while(a<b && std::isspace((unsigned char)in[a])) a++;
-        while(b>a && std::isspace((unsigned char)in[b-1])) b--;
+        while(a<b && std::isspace(static_cast<unsigned char>(in[a]))) a++;
+        while(b>a && std::isspace(static_cast<unsigned char>(in[b - 1]))) b--;
         return in.substr(a,b-a);
     }
 
@@ -33,11 +33,11 @@ namespace utils {
         }
         // hex
         if(pn.raw.size()>2 && pn.raw[0]=='0' && (pn.raw[1]=='x'||pn.raw[1]=='X')) {
-            bool ok=true; for(size_t i=2;i<pn.raw.size();++i){ char c=pn.raw[i]; if(!std::isxdigit((unsigned char)c)) { ok=false; break; } }
+            bool ok=true; for(size_t i=2;i<pn.raw.size();++i){ char c=pn.raw[i]; if(!std::isxdigit(static_cast<unsigned char>(c))) { ok=false; break; } }
             if(ok) { pn.known=true; pn.is_hex=true; return pn; }
         }
         // decimal
-        bool dec=true; for(char c: pn.raw){ if(!std::isdigit((unsigned char)c)) { dec=false; break; } }
+        bool dec=true; for(char c: pn.raw){ if(!std::isdigit(static_cast<unsigned char>(c))) { dec=false; break; } }
         if(dec) { pn.known=true; pn.is_dec=true; return pn; }
         pn.known=false; return pn;
     }
