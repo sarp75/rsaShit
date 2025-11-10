@@ -15,9 +15,9 @@
  */
 
 static BigInt crt(const std::vector<BigInt>& residues, const std::vector<BigInt>& moduli) {
-    BigInt N(uint64_t(1));
+    BigInt N(static_cast<uint64_t>(1));
     for(const auto& m : moduli) N *= m;
-    BigInt x(uint64_t(0));
+    BigInt x(static_cast<uint64_t>(0));
     for(size_t i=0;i<moduli.size();++i) {
         BigInt Mi = N / moduli[i];
         auto inv = BigInt::mod_inverse(Mi % moduli[i], moduli[i]);
@@ -29,7 +29,7 @@ static BigInt crt(const std::vector<BigInt>& residues, const std::vector<BigInt>
 }
 
 LoweResult low_e_broadcast(const std::vector<LoweTarget>& targets, unsigned e) {
-    LoweResult result{false, BigInt(uint64_t(0)), ""};
+    LoweResult result{false, BigInt(static_cast<uint64_t>(0)), ""};
     if(targets.size() < e) { result.log = "need at least e targets"; return result; }
     std::vector<BigInt> residues; residues.reserve(targets.size());
     std::vector<BigInt> moduli; moduli.reserve(targets.size());
@@ -40,7 +40,7 @@ LoweResult low_e_broadcast(const std::vector<LoweTarget>& targets, unsigned e) {
     try {
         BigInt combined = crt(residues, moduli);
         BigInt m = BigInt::nth_root_floor(combined, e);
-        BigInt exact(uint64_t(1));
+        BigInt exact(static_cast<uint64_t>(1));
         for(unsigned i=0;i<e;i++) exact *= m;
         if(exact == combined) {
             result.success = true;

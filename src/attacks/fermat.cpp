@@ -12,7 +12,7 @@
  */
 
 static bool is_perfect_square(const BigInt &x, BigInt &root) {
-    if(x.is_zero()) { root = BigInt(uint64_t(0)); return true; }
+    if(x.is_zero()) { root = BigInt(static_cast<uint64_t>(0)); return true; }
     BigInt r = BigInt::nth_root_floor(x, 2);
     if(r * r == x) { root = r; return true; }
     return false;
@@ -21,14 +21,14 @@ static bool is_perfect_square(const BigInt &x, BigInt &root) {
 FermatResult fermat_factor(const BigInt &n, unsigned long long max_iters) {
     FermatResult fr; std::ostringstream log;
     // trivial checks
-    BigInt two(uint64_t(2));
+    BigInt two(static_cast<uint64_t>(2));
     if(n.is_zero()) { log << "n=0"; fr.log = log.str(); return fr; }
     if((n % two).is_zero()) { fr.success=true; fr.p=two; fr.q=n/two; log<<"even n"; fr.log=log.str(); return fr; }
 
     // a = ceil(sqrt(n))
     BigInt a = BigInt::nth_root_floor(n, 2);
-    if(a*a < n) a += BigInt(uint64_t(1));
-    BigInt one(uint64_t(1));
+    if(a*a < n) a += BigInt(static_cast<uint64_t>(1));
+    BigInt one(static_cast<uint64_t>(1));
     for(unsigned long long i=0;i<max_iters;i++) {
         BigInt x = a*a - n; // candidate square
         BigInt b; // root holder

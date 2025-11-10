@@ -5,8 +5,8 @@
 
 struct FermatResult {
     bool success{false};
-    BigInt p{uint64_t(0)};
-    BigInt q{uint64_t(0)};
+    BigInt p{static_cast<uint64_t>(0)};
+    BigInt q{static_cast<uint64_t>(0)};
     std::string log;
 };
 
